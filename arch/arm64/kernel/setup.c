@@ -91,6 +91,10 @@ static const char *cpu_name;
 static const char *machine_name;
 phys_addr_t __fdt_pointer __initdata;
 
+#if defined(CONFIG_VGA_CONSOLE) || defined(CONFIG_DUMMY_CONSOLE)                                               
+struct screen_info screen_info;                                                                                
+#endif 
+
 /*
  * Standard memory resources
  */

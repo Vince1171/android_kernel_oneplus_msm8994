@@ -1142,7 +1142,7 @@ static int exfat_allow_set_time(struct exfat_sb_info *sbi, struct inode *inode)
 {
 	mode_t allow_utime = sbi->options.allow_utime;
 
-	if (current_fsuid() != inode->i_uid) {
+	if (current_fsuid().val != inode->i_uid.val) {
 		if (in_group_p(inode->i_gid))
 			allow_utime >>= 3;
 		if (allow_utime & MAY_WRITE)
@@ -1215,9 +1215,9 @@ static int exfat_setattr(struct dentry *dentry, struct iattr *attr)
 	}
 
 	if (((attr->ia_valid & ATTR_UID) &&
-		 (attr->ia_uid != sbi->options.fs_uid)) ||
+		 (attr->ia_uid.val != sbi->options.fs_uid)) ||
 		((attr->ia_valid & ATTR_GID) &&
-		 (attr->ia_gid != sbi->options.fs_gid)) ||
+		 (attr->ia_gid.val != sbi->options.fs_gid)) ||
 		((attr->ia_valid & ATTR_MODE) &&
 		 (attr->ia_mode & ~(S_IFREG | S_IFLNK | S_IFDIR | S_IRWXUGO)))) {
 		return -EPERM;
@@ -1674,8 +1674,8 @@ static int exfat_fill_inode(struct inode *inode, FILE_ID_T *fid)
 
 	EXFAT_I(inode)->i_pos = 0;
 	EXFAT_I(inode)->target = NULL;
-	inode->i_uid = sbi->options.fs_uid;
-	inode->i_gid = sbi->options.fs_gid;
+	inode->i_uid.val = sbi->options.fs_uid;
+	inode->i_gid.val = sbi->options.fs_gid;
 	inode->i_version++;
 	inode->i_generation = get_seconds();
 
@@ -2044,8 +2044,8 @@ static int parse_options(char *options, int silent, int *debug,
 	int option;
 	char *iocharset;
 
-	opts->fs_uid = current_uid();
-	opts->fs_gid = current_gid();
+	opts->fs_uid = current_uid().val;
+	opts->fs_gid = current_gid().val;
 	opts->fs_fmask = opts->fs_dmask = current->fs->umask;
 	opts->allow_utime = (unsigned short) -1;
 	opts->codepage = exfat_default_codepage;
@@ -2179,8 +2179,8 @@ static int exfat_read_root(struct inode *inode)
 
 	FsReadStat(inode, &info);
 
-	inode->i_uid = sbi->options.fs_uid;
-	inode->i_gid = sbi->options.fs_gid;
+	inode->i_uid.val = sbi->options.fs_uid;
+	inode->i_gid.val = sbi->options.fs_gid;
 	inode->i_version++;
 	inode->i_generation = 0;
 	inode->i_mode = exfat_make_mode(sbi, ATTR_SUBDIR, S_IRWXUGO);

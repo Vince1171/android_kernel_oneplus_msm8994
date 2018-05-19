@@ -10,12 +10,14 @@
 #include <linux/socket.h>
 #include <linux/in6.h>
 #include <linux/atomic.h>
+#include <linux/uidgid.h>
 
 /*
  * ifindex generation is per-net namespace, and loopback is
  * always the 1st device in ns (see net_dev_init), thus any
  * loopback device should get ifindex 1
  */
+
 
 #define LOOPBACK_IFINDEX	1
 
@@ -33,6 +35,7 @@ struct flowi_common {
 	__u32	flowic_secid;
 	uid_t	flowic_uid;
 };
+
 
 union flowi_uli {
 	struct {
@@ -89,7 +92,7 @@ static inline void flowi4_init_output(struct flowi4 *fl4, int oif,
 				      __u8 proto, __u8 flags,
 				      __be32 daddr, __be32 saddr,
 				      __be16 dport, __be16 sport,
-				      uid_t uid)
+				      kuid_t uid)
 {
 	fl4->flowi4_oif = oif;
 	fl4->flowi4_iif = LOOPBACK_IFINDEX;
@@ -99,7 +102,7 @@ static inline void flowi4_init_output(struct flowi4 *fl4, int oif,
 	fl4->flowi4_proto = proto;
 	fl4->flowi4_flags = flags;
 	fl4->flowi4_secid = 0;
-	fl4->flowi4_uid = uid;
+	fl4->flowi4_uid = uid.val;
 	fl4->daddr = daddr;
 	fl4->saddr = saddr;
 	fl4->fl4_dport = dport;

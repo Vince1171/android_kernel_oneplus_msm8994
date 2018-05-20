@@ -31,7 +31,7 @@
 #include <linux/binfmts.h>
 #include <linux/personality.h>
 
-#ifdef CONFIG_ANDROID_PARANOID_NETWORK
+#ifdef CONFIG_SECURITY_ANDROID_GID_CAPABILITIES
 #include <linux/android_aid.h>
 #endif
 
@@ -82,7 +82,7 @@ int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
 {
 	struct user_namespace *ns = targ_ns;
 
-#ifdef CONFIG_ANDROID_PARANOID_NETWORK
+#ifdef CONFIG_SECURITY_ANDROID_GID_CAPABILITIES
     kgid_t tmp1 = {AID_NET_RAW};
     kgid_t tmp2 = {AID_NET_ADMIN};
 	if (cap == CAP_NET_RAW && in_egroup_p(tmp1))

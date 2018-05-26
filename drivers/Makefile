@@ -98,6 +98,17 @@ obj-$(CONFIG_GAMEPORT)		+= input/gameport/
 obj-$(CONFIG_INPUT)		+= input/
 obj-$(CONFIG_I2O)		+= message/
 obj-$(CONFIG_RTC_LIB)		+= rtc/
+
+#common clk code
+obj-y				+= clk/
+
+obj-$(CONFIG_MAILBOX)		+= mailbox/
+obj-$(CONFIG_HWSPINLOCK)	+= hwspinlock/
+obj-$(CONFIG_NFC)		+= nfc/
+obj-$(CONFIG_IOMMU_SUPPORT)	+= iommu/
+obj-$(CONFIG_REMOTEPROC)	+= remoteproc/
+obj-$(CONFIG_RPMSG)		+= rpmsg/
+
 obj-y				+= i2c/ media/
 obj-$(CONFIG_PPS)		+= pps/
 obj-$(CONFIG_PTP_1588_CLOCK)	+= ptp/
@@ -138,17 +149,6 @@ obj-$(CONFIG_VHOST_RING)	+= vhost/
 obj-$(CONFIG_VLYNQ)		+= vlynq/
 obj-$(CONFIG_STAGING)		+= staging/
 obj-y				+= platform/
-
-#common clk code
-obj-y				+= clk/
-
-obj-$(CONFIG_MAILBOX)		+= mailbox/
-obj-$(CONFIG_HWSPINLOCK)	+= hwspinlock/
-obj-$(CONFIG_NFC)		+= nfc/
-obj-$(CONFIG_IOMMU_SUPPORT)	+= iommu/
-obj-$(CONFIG_REMOTEPROC)	+= remoteproc/
-obj-$(CONFIG_RPMSG)		+= rpmsg/
-
 
 # Virtualization drivers
 obj-$(CONFIG_VIRT_DRIVERS)	+= virt/

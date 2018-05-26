@@ -28,6 +28,10 @@
 #include <linux/audit.h>
 #include <linux/falloc.h>
 #include <linux/fs_struct.h>
+
+#define CREATE_TRACE_POINTS
+#include <trace/events/fs.h>
+
 #include <linux/ima.h>
 #include <linux/dnotify.h>
 #include <linux/compat.h>
@@ -951,6 +955,7 @@ long do_sys_open(int dfd, const char __user *filename, int flags, umode_t mode)
 			} else {
 				fsnotify_open(f);
 				fd_install(fd, f);
+				trace_do_sys_open(tmp->name, flags, mode);
 			}
 		}
 		putname(tmp);

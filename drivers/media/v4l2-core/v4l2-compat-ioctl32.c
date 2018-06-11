@@ -1031,6 +1031,7 @@ long v4l2_compat_ioctl32(struct file *file, unsigned int cmd, unsigned long arg)
 		return ret;
 
 	switch (cmd) {
+	/* V4L2 ioctls */
 	case VIDIOC_QUERYCAP:
 	case VIDIOC_RESERVED:
 	case VIDIOC_ENUM_FMT:
@@ -1114,6 +1115,17 @@ long v4l2_compat_ioctl32(struct file *file, unsigned int cmd, unsigned long arg)
 	case VIDIOC_ENUM_FREQ_BANDS:
 	case VIDIOC_SUBDEV_G_EDID32:
 	case VIDIOC_SUBDEV_S_EDID32:
+	case VIDIOC_SUBDEV_G_FMT:
+	case VIDIOC_SUBDEV_S_FMT:
+	case VIDIOC_SUBDEV_G_FRAME_INTERVAL:
+	case VIDIOC_SUBDEV_S_FRAME_INTERVAL:
+	case VIDIOC_SUBDEV_ENUM_MBUS_CODE:
+	case VIDIOC_SUBDEV_ENUM_FRAME_SIZE:
+	case VIDIOC_SUBDEV_ENUM_FRAME_INTERVAL:
+	case VIDIOC_SUBDEV_G_CROP:
+	case VIDIOC_SUBDEV_S_CROP:
+	case VIDIOC_SUBDEV_G_SELECTION:
+	case VIDIOC_SUBDEV_S_SELECTION:
 		ret = do_video_ioctl(file, cmd, arg);
 		break;
 

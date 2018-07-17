@@ -154,7 +154,7 @@ void tasks_test_saved(void)
 			tasks_mem_get(mm, &vsize, &vrss);
 		}
 		printk("%d\t%d\t%ld\t%ld\t%s\t%s\n",
-			cred->uid,
+			cred->uid.val,
 			task_pid_nr(p),
 			vsize,
 			vrss,

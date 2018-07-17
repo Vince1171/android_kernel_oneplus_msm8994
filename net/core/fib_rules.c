@@ -17,10 +17,6 @@
 #include <net/sock.h>
 #include <net/fib_rules.h>
 
-#define uid_valid(uid) ((uid) != -1)
-#define uid_lte(a, b) ((a) <= (b))
-#define uid_eq(a, b) ((a) == (b))
-#define uid_gte(a, b) ((a) >= (b))
 
 int fib_default_rule_add(struct fib_rules_ops *ops,
 			 u32 pref, u32 table, u32 flags)
@@ -36,8 +32,8 @@ int fib_default_rule_add(struct fib_rules_ops *ops,
 	r->pref = pref;
 	r->table = table;
 	r->flags = flags;
-	r->uid_start = INVALID_UID;
-	r->uid_end = INVALID_UID;
+	r->uid_start = -1;
+	r->uid_end = -1;
 	r->fr_net = hold_net(ops->fro_net);
 
 	/* The lock is not required here, the list in unreacheable
@@ -198,9 +194,9 @@ static int nla_put_uid(struct sk_buff *skb, int idx, uid_t uid)
 
 static int fib_uid_range_match(struct flowi *fl, struct fib_rule *rule)
 {
-	return (!uid_valid(rule->uid_start) && !uid_valid(rule->uid_end)) ||
-	       (uid_gte(fl->flowi_uid, rule->uid_start) &&
-		uid_lte(fl->flowi_uid, rule->uid_end));
+	return (!uid_valid((kuid_t){rule->uid_start}) && !uid_valid((kuid_t){rule->uid_end})) ||
+	       (uid_gte(fl->flowi_uid, (kuid_t){rule->uid_start}) &&
+		uid_lte(fl->flowi_uid, (kuid_t){rule->uid_end}));
 }
 
 static int fib_rule_match(struct fib_rule *rule, struct fib_rules_ops *ops,
@@ -391,15 +387,15 @@ static int fib_nl_newrule(struct sk_buff *skb, struct nlmsghdr* nlh)
 		goto errout_free;
 
 	/* UID start and end must either both be valid or both unspecified. */
-	rule->uid_start = rule->uid_end = INVALID_UID;
+	rule->uid_start = rule->uid_end = -1;
 	if (tb[FRA_UID_START] || tb[FRA_UID_END]) {
 		if (tb[FRA_UID_START] && tb[FRA_UID_END]) {
 			rule->uid_start = fib_nl_uid(tb[FRA_UID_START]);
 			rule->uid_end = fib_nl_uid(tb[FRA_UID_END]);
 		}
-		if (!uid_valid(rule->uid_start) ||
-		    !uid_valid(rule->uid_end) ||
-		    !uid_lte(rule->uid_start, rule->uid_end))
+		if (!uid_valid((kuid_t){rule->uid_start}) ||
+		    !uid_valid((kuid_t){rule->uid_end}) ||
+		    !uid_lte((kuid_t){rule->uid_start}, (kuid_t){rule->uid_end}))
 		goto errout_free;
 	}
 
@@ -510,11 +506,11 @@ static int fib_nl_delrule(struct sk_buff *skb, struct nlmsghdr* nlh)
 			continue;
 
 		if (tb[FRA_UID_START] &&
-		    !uid_eq(rule->uid_start, fib_nl_uid(tb[FRA_UID_START])))
-			continue;
+		    !uid_eq(KUIDT_INIT(rule->uid_start), KUIDT_INIT(fib_nl_uid(tb[FRA_UID_START]))))
+ 			continue;
 
 		if (tb[FRA_UID_END] &&
-		    !uid_eq(rule->uid_end, fib_nl_uid(tb[FRA_UID_END])))
+		    !uid_eq(KUIDT_INIT(rule->uid_end), KUIDT_INIT(fib_nl_uid(tb[FRA_UID_END]))))
 			continue;
 
 		if (!ops->compare(rule, frh, tb))
@@ -632,10 +628,10 @@ static int fib_nl_fill_rule(struct sk_buff *skb, struct fib_rule *rule,
 	     nla_put_u32(skb, FRA_GOTO, rule->target)))
 		goto nla_put_failure;
 
-	if (uid_valid(rule->uid_start))
+	if (uid_valid(KUIDT_INIT(rule->uid_start)))
 	     nla_put_uid(skb, FRA_UID_START, rule->uid_start);
 
-	if (uid_valid(rule->uid_end))
+	if (uid_valid(KUIDT_INIT(rule->uid_end)))
 	     nla_put_uid(skb, FRA_UID_END, rule->uid_end);
 
 	if (ops->fill(rule, skb, frh) < 0)

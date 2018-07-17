@@ -67,6 +67,8 @@ EXPORT_SYMBOL(processor_id);
 unsigned long elf_hwcap __read_mostly;
 EXPORT_SYMBOL_GPL(elf_hwcap);
 
+struct screen_info screen_info;
+
 unsigned int boot_reason;
 EXPORT_SYMBOL(boot_reason);
 

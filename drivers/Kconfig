@@ -188,6 +188,9 @@ source "drivers/soc/Kconfig"
 
 source "drivers/firmware/Kconfig"
 
+# anbox
+source "drivers/anbox/Kconfig"
+
 #ifdef VENDOR_EDIT
 # hefaxi@filesystem,2015/05/05,support param partion read/write
 source "drivers/param_read_write/Kconfig"

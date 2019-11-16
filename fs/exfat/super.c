@@ -574,8 +574,6 @@ static int exfat_readdir(struct file *filp, void *dirent, filldir_t filldir)
 {
 	struct inode *inode = filp->f_path.dentry->d_inode;
 	struct super_block *sb = inode->i_sb;
-	struct exfat_sb_info *sbi = EXFAT_SB(sb);
-	FS_INFO_T *fsi = &(sbi->fsi);
 	DIR_ENTRY_T de;
 	DENTRY_NAMEBUF_T *nb = &(de.NameBuf);
 	unsigned long inum;

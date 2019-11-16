@@ -1,15 +1,42 @@
+#
+# Makefile for the linux FAT12/16/32(VFAT)/64(exFAT) filesystem driver.
+#
 
-obj-y += exfat_core.o exfat_fs.o
+ifneq ($(KERNELRELEASE),)
+# Called from inline kernel build
+# DKMS_DEFINE
+obj-$(CONFIG_EXFAT_FS) += exfat.o
 
-exfat_fs-y	:= exfat_super.o
+exfat-objs	:= super.o core.o core_exfat.o blkdev.o fatent.o cache.o \
+		   nls.o misc.o extent.o xattr.o
+else
+# Called from external kernel module build
 
-exfat_core-y	:= exfat.o exfat_api.o exfat_blkdev.o exfat_cache.o \
-			   exfat_data.o exfat_global.o exfat_nls.o \
-			   exfat_oal.o exfat_upcase.o exfat_xattr.o
+KERNELRELEASE	?= $(shell uname -r)
+KDIR	?= /lib/modules/${KERNELRELEASE}/build
+MDIR	?= /lib/modules/${KERNELRELEASE}
+PWD	:= $(shell pwd)
+
+export CONFIG_EXFAT_FS := m
 
 all:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	$(MAKE) -C $(KDIR) M=$(PWD) clean
 
+help:
+	$(MAKE) -C $(KDIR) M=$(PWD) help
+
+install: exfat.ko
+	rm -f ${MDIR}/kernel/fs/exfat/exfat.ko
+	install -m644 -b -D exfat.ko ${MDIR}/kernel/fs/exfat/exfat.ko
+	depmod -aq
+
+uninstall:
+	rm -rf ${MDIR}/kernel/fs/exfat
+	depmod -aq
+
+endif
+
+.PHONY : all clean install uninstall
